@@ -1,0 +1,11 @@
+Technology Constraints
+
+Technical Stack
+
+JavaScript/Node.js for Discord bot backend.
+- discord.js library for Discord API integration.
+- MySQL database for persistent storage (separate for dev, test, prod environments).
+- Jest for JavaScript tests.
+- Slash commands for Discord bot interaction.
+
+Purpose: Locks AI to a consistent tech stack, preventing unwanted deviations (e.g., JSON over SQL).
