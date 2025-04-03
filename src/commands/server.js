@@ -1,7 +1,7 @@
 /**
- * Command to get information about the server
+ * Command to get information about the server (Admin only)
  */
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const { getDatabase } = require('../database/connection');
 
 module.exports = {
@@ -13,6 +13,14 @@ module.exports = {
     // If not in a guild, return error
     if (!interaction.guild) {
       return interaction.reply({ content: 'This command can only be used in a server!', ephemeral: true });
+    }
+    
+    // Check if user has admin permissions
+    if (!await hasAdminPermission(interaction)) {
+      return interaction.reply({
+        content: 'You do not have permission to use this command. Admin role required.',
+        ephemeral: true
+      });
     }
     
     await interaction.deferReply();
@@ -68,4 +76,25 @@ module.exports = {
       await interaction.editReply('Failed to fetch server information. Please try again later.');
     }
   },
+  
+  // Specify command category
+  category: 'Admin'
 };
+
+/**
+ * Check if user has permission to use admin commands
+ */
+async function hasAdminPermission(interaction) {
+  // Allow server administrators
+  if (interaction.member.permissions.has(PermissionFlagsBits.Administrator)) {
+    return true;
+  }
+  
+  // Define authorized role names (convert to lowercase for case-insensitive comparison)
+  const authorizedRoles = ['leadership', 'admin', 'r4+'];
+  
+  // Check if user has any of the authorized roles
+  return interaction.member.roles.cache.some(role => 
+    authorizedRoles.includes(role.name.toLowerCase())
+  );
+}
